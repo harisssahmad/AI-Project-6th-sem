@@ -2,15 +2,13 @@ require("dotenv").config();
 
 const Groq = require("groq-sdk");
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY,
 });
 async function main() {
-    const chatCompletion = await getGroqChatCompletion();
-    const jsonResponse = JSON.parse(
-        chatCompletion.choices[0]?.message?.content
-    ); // Parse the response as JSON
-    // console.log(chatCompletion.choices[0]?.message?.content || "");
-    console.log(jsonResponse);
+  const chatCompletion = await getGroqChatCompletion();
+  const jsonResponse = JSON.parse(chatCompletion.choices[0]?.message?.content); // Parse the response as JSON
+  // console.log(chatCompletion.choices[0]?.message?.content || "");
+  console.log(jsonResponse);
 }
 
 const task = `Regression Task with Boston Housing Dataset:
@@ -99,17 +97,17 @@ print("Random Forest MSE:")
 print(mseFor)`;
 
 async function getGroqChatCompletion() {
-    return await groq.chat.completions.create({
-        model: "mixtral-8x7b-32768",
-        messages: [
-            {
-                role: "system",
-                content:
-                    "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
-            },
-            {
-                role: "user",
-                content: `You've been presented with two code samples (Code A and Code B) that aim to solve the same problem, which is to ${task}. My task is to thoroughly evaluate both codes and provide feedback on the following aspects:
+  return await groq.chat.completions.create({
+    model: "mixtral-8x7b-32768",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
+      },
+      {
+        role: "user",
+        content: `You've been presented with two code samples (Code A and Code B) that aim to solve the same problem, which is to ${task}. My task is to thoroughly evaluate both codes and provide feedback on the following aspects:
 
                 1. **Code Understanding**: Can the code correctly solve the problem as stated?
                 2. **Code Quality**: Is the code well-structured, readable, and maintainable?
@@ -146,14 +144,14 @@ async function getGroqChatCompletion() {
                     small comment
                   }
                 }`,
-            },
-        ],
-    });
+      },
+    ],
+  });
 }
 
 module.exports = {
-    main,
-    getGroqChatCompletion,
+  main,
+  getGroqChatCompletion,
 };
 
 main();
