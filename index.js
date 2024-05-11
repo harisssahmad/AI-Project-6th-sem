@@ -1,29 +1,32 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
-const port = 3000;
+const port = 3001;
 require("dotenv").config();
 
 const Groq = require("groq-sdk");
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+    apiKey: process.env.GROQ_API_KEY_2,
 });
 
 app.use(express.json());
 
-app.post("/api/single-code-plag-check", async (req, res) => {
-  const { task, code } = req.body;
+app.use(cors());
 
-  const chatCompletion = await groq.chat.completions.create({
-    model: "mixtral-8x7b-32768",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
-      },
-      {
-        role: "user",
-        content: `You've been presented with a code sample (Code) that aims to solve a specific problem, which is to ${task}. My task is to thoroughly evaluate the code and provide feedback on the following aspects:
+app.post("/api/single-code-plag-check", async (req, res) => {
+    const { task, code } = req.body;
+
+    const chatCompletion = await groq.chat.completions.create({
+        model: "mixtral-8x7b-32768",
+        messages: [
+            {
+                role: "system",
+                content:
+                    "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
+            },
+            {
+                role: "user",
+                content: `You've been presented with a code sample (Code) that aims to solve a specific problem, which is to ${task}. My task is to thoroughly evaluate the code and provide feedback on the following aspects:
 
               1. **Code Understanding**: Can the code correctly solve the problem as stated?
               2. **Code Quality**: Is the code well-structured, readable, and maintainable?
@@ -49,29 +52,31 @@ app.post("/api/single-code-plag-check", async (req, res) => {
                   small comment
                 }
               }`,
-      },
-    ],
-  });
+            },
+        ],
+    });
 
-  const jsonResponse = JSON.parse(chatCompletion.choices[0]?.message?.content);
+    const jsonResponse = JSON.parse(
+        chatCompletion.choices[0]?.message?.content
+    );
 
-  res.send(chatCompletion.choices[0]?.message?.content);
+    res.send(chatCompletion.choices[0]?.message?.content);
 });
 
 app.post("/api/two-code-plag-check", async (req, res) => {
-  const { task, codeA, codeB } = req.body;
+    const { task, codeA, codeB } = req.body;
 
-  const chatCompletion = await groq.chat.completions.create({
-    model: "mixtral-8x7b-32768",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
-      },
-      {
-        role: "user",
-        content: `You've been presented with two code samples (Code A and Code B) that aim to solve the same problem, which is to ${task}. My task is to thoroughly evaluate both codes and provide feedback on the following aspects:
+    const chatCompletion = await groq.chat.completions.create({
+        model: "mixtral-8x7b-32768",
+        messages: [
+            {
+                role: "system",
+                content:
+                    "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
+            },
+            {
+                role: "user",
+                content: `You've been presented with two code samples (Code A and Code B) that aim to solve the same problem, which is to ${task}. My task is to thoroughly evaluate both codes and provide feedback on the following aspects:
 
                 1. **Code Understanding**: Can the code correctly solve the problem as stated?
                 2. **Code Quality**: Is the code well-structured, readable, and maintainable?
@@ -108,18 +113,22 @@ app.post("/api/two-code-plag-check", async (req, res) => {
                     small comment
                   }
                 }`,
-      },
-    ],
-  });
+            },
+        ],
+    });
 
-  const jsonResponse = JSON.parse(chatCompletion.choices[0]?.message?.content);
+    const jsonResponse = JSON.parse(
+        chatCompletion.choices[0]?.message?.content
+    );
 
-  res.send(chatCompletion.choices[0]?.message?.content);
+    res.send(chatCompletion.choices[0]?.message?.content);
 });
 
 app.post("/", (req, res) => {
-  console.log(req.body);
-  res.json({ success: true });
+    console.log(req.body);
+    res.json({ success: true });
 });
 
-app.listen(port, () => console.log(`app listening at http://localhost:3000`));
+app.listen(port, () =>
+    console.log(`app listening at http://localhost:${port}`)
+);
