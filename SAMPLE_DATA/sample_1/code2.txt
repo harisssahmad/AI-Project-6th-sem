@@ -1,0 +1,40 @@
+#include <stdio.h>
+int main(){
+	printf("Name: Syed Ammar Ali\nID: 23k-0740\n\n");
+	int bats,inn;
+	printf("Enter number of batsmen: ");
+	scanf("%d",&bats);
+	printf("Enter number of innings: ");
+	scanf("%d",&inn);
+	int high[bats],cent[bats],hcent[bats],truns[bats],avg[bats];
+	for(int i=0;i<bats;i++){
+        high[i]=0;
+        cent[i]=0;
+        hcent[i]=0;
+        truns[i]=0;
+        avg[i]=0;
+    }
+	int table[bats][inn];
+	for (int i=0;i<bats;i++){
+		printf("Enter Runs scored by Batsmen %d of ",i+1);
+		for (int j=0;j<inn;j++){
+			printf("Innings %d: ",j+1);
+			scanf("%d",&table[i][j]);
+			truns[i]+=table[i][j];
+			avg[i]=truns[i]/bats;
+			if(table[i][j]>high[i])
+				high[i]=table[i][j];
+			if(table[i][j]>50){
+				if(table[i][j]>100)
+				cent[i]++;
+				else
+				hcent[i]++;
+			}
+		}
+	}
+	printf("Batsmen Number\tTotal Runs\tAverage Score\tHighest Score\tNo Of Centuries\tNo of Half-Centuries\n");
+	for(int i=0;i<bats;i++){
+			printf("\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n",i+1,truns[i],avg[i],high[i],cent[i],hcent[i]);
+		}
+	return 0;
+}

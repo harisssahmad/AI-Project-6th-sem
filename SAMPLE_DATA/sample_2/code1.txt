@@ -1,0 +1,26 @@
+task2_data = pd.read_csv('/content/boston_house_prices.csv', header=1)
+task2_data.head()
+
+task2_data.plot.scatter('RM', 'MEDV')
+
+from sklearn.linear_model import LinearRegression
+
+X = task2_data[['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX', 'PTRATIO', 'LSTAT']]
+Y = task2_data['MEDV']
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y)
+
+LR = LinearRegression()
+
+LR.fit(X_train,Y_train)
+predictions = LR.predict(X_test)
+
+plt.scatter(Y_test,predictions)
+plt.xlabel('Y Test')
+plt.ylabel('Predicted Y')
+
+from sklearn import metrics
+
+print('[INFO]\tMean Absolute Error:\t', metrics.mean_absolute_error(Y_test, predictions))
+print('[INFO]\tMean Squared Error:\t', metrics.mean_squared_error(Y_test, predictions))
+print('[INFO]\tRoot Mean Squared Error:', np.sqrt(metrics.mean_squared_error(Y_test, predictions)))

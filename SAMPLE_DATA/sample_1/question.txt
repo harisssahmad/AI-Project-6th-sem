@@ -1,0 +1,14 @@
+You are given a 2D array that represents the batting performance of a cricket team. Each row in the
+array corresponds to a different batsman, and each column represents an inning played by that
+batsman. The values in the array represent the runs scored by each batsman in each inning.
+Write a C program to perform the following tasks:
+1) Input the number of batsmen and the number of innings from the user.
+2) Input the batting performance for each batsman in each inning.
+3) Calculate and display the following statistics for each batsman.
+● Total runs scored.
+● Average runs per inning
+
+● Highest score in a single inning
+● Number of centuries (innings with a score of 100 or more)
+● Number of half-centuries (innings with a score of 50-99)
+Your program should display the statistics for each batsman individually.

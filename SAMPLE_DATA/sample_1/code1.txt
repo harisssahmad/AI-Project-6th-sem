@@ -1,0 +1,48 @@
+#include<stdio.h>
+int main(){
+int n_batsmen, n_innings;
+
+printf("Enter the number of batsmen: ");
+scanf("%d",&n_batsmen);
+printf("Enter the number of innings: ");
+scanf("%d",&n_innings);
+
+int stats[n_batsmen][n_innings];
+for (int i=0;i<n_batsmen;i++){
+printf("Enter the batting performance for batsman %d:\n",i+1);
+for (int j=0;j<n_innings;j++){
+printf("Inning %d: ",j+1);
+scanf("%d", &stats[i][j]);
+}
+}
+
+for (int i=0;i<n_batsmen;i++){
+int t_runs=0;
+int h_score=0;
+int centuries=0;
+int h_centuries=0;
+
+for (int j=0;j<n_innings;j++){
+t_runs+=stats[i][j];
+if (stats[i][j]>h_score){
+h_score=stats[i][j];
+}
+if (stats[i][j]>=100){
+centuries++;
+} else if (stats[i][j]>=50){
+h_centuries++;
+}
+}
+
+float average=t_runs/n_innings;
+
+printf("\nStatistics for batsman %d:\n",i+1);
+printf("Total runs scored: %d\n",t_runs);
+printf("Average runs per inning: %.2f\n",average);
+printf("Highest score in a single inning: %d\n",h_score);
+printf("Number of centuries: %d\n",centuries);
+printf("Number of half-centuries: %d\n",h_centuries);
+}
+
+return 0;
+}

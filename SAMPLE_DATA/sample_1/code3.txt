@@ -1,0 +1,42 @@
+#include<stdio.h>
+int main (){
+int players, innings, i;
+printf("enter the number of players and innings played by them\t");
+scanf("%d %d",&players,&innings);
+int perform[players][innings], highest[players], cen[players], half_cen[players],
+total[players];
+float avg[players];
+
+for(i=0;i<players;i++){
+highest[i]=0;
+cen[i]=0;
+half_cen[i]=0;
+total[i]=0;
+
+printf("enter the performance of players %d\t",i+1);
+for(int j=0;j<innings;j++){
+scanf("%d",&perform[i][j]);
+
+total[i]+=perform[i][j];
+
+if (highest[i]<perform[i][j])
+highest[i]=perform[i][j];
+
+if (perform[i][j]>=100)
+cen[i]++;
+else if(perform[i][j]>=50 && perform[i][j]<100)
+half_cen[i]++;
+
+}
+avg[i]=total[i]/innings;
+
+}
+for (i=0;i<players;i++){
+printf("Statistics for player %d are as follows :\n",i+1);
+printf("Total : %d\n",total[i]);
+printf("AVG : %.2f\n",avg[i]);
+printf("Highest : %d\n",highest[i]);
+printf("Centuries : %d\n",cen[i]);
+printf("Half Centuries : %d\n\n",half_cen[i]);
+}
+}

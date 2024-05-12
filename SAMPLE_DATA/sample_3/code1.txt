@@ -1,0 +1,63 @@
+#include <stdio.h>
+
+int main() {
+    int rows, cols;
+    printf("23k-0857\nMuhammad Daniyal\n");
+    printf("Enter number of rows: ");
+    scanf("%d", &rows);
+    printf("Enter number of columns: ");
+    scanf("%d", &cols);
+
+    int array[rows][cols];
+    printf("Enter elements (0 or 1) for the array:\n");
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            scanf("%d", &array[i][j]);
+        }
+    }
+
+    int maxSize = 0, maxRow = 0, maxCol = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (array[i][j] == 1) {
+                int size = 1;
+                int found = 1;
+
+                while (size + i < rows && size + j < cols && found) {
+                    for (int k = i; k <= i + size; k++) {
+                        if (array[k][j + size] == 0) {
+                            found = 0;
+                            break;
+                        }
+                    }
+                    for (int k = j; k <= j + size; k++) {
+                        if (array[i + size][k] == 0) {
+                            found = 0;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        size++;
+                    }
+                }
+
+                if (size > maxSize) {
+                    maxSize = size;
+                    maxRow = i;
+                    maxCol = j;
+                }
+            }
+        }
+    }
+
+    printf("Dimensions of the largest square submatrix: %dx%d\n", maxSize, maxSize);
+    printf("Largest square submatrix:\n");
+    for (int i = maxRow; i < maxRow + maxSize; i++) {
+        for (int j = maxCol; j < maxCol + maxSize; j++) {
+            printf("%d ", array[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}

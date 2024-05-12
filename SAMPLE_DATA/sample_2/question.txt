@@ -1,0 +1,6 @@
+Regression Task with Boston Housing Dataset:
+
+Load the Boston Housing dataset (load_boston()) from sklearn.datasets.
+Split the dataset into training and testing sets.
+Implement a regression model (e.g., Linear Regression, Random Forest) to predict house prices.
+Calculate and analyze the model's performance using metrics like mean squared error.

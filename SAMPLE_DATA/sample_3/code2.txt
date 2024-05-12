@@ -1,0 +1,50 @@
+#include <stdio.h>
+int submatrix();
+int main() {
+	printf("Muhammad Shaheer Shakeel   23k-0888\n");
+	int i,j,k,l,m,n,o,p=0,z,c;
+	printf("Enter row and column of 2d array:\n");
+	scanf("%d %d",&n,&o);
+	int arr[n][o];
+	z = n>o?n:o;
+	printf("Fill the array:\n");
+	for (i=0;i<n;i++) {
+		for (j=0;j<o;j++) {
+			scanf("%d",&arr[i][j]);
+	    }
+	}
+	for (k=z;k>0;k--) {		
+		for (l=0;l<(n-k+1);l++) {
+			for (m=0;m<(o-k+1);m++) {
+				c=0;
+				for (i=l;i<(k+l);i++) {
+					for (j=m;j<(k+m);j++) {
+						if (arr[i][j] != 1) {
+							continue;
+						} else {
+							c++;	
+						}
+						if (c==(k*k)) {
+							p=1;
+							break;
+						}
+					}
+					if (p==1) {
+					break;
+					}
+				}
+				if (p==1) {
+				break;
+				}				
+			}
+			if (p==1) {
+			break;
+			}
+		}
+		if (p==1) {
+		break;
+		}
+	}
+	printf("Largest submatrix of 1s has size: %d",k);
+}
+

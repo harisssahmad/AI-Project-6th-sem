@@ -1,0 +1,41 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+
+# Load the dataset
+data = pd.read_csv('/content/boston_house_prices.csv', header=1)
+
+# Display the first few rows of the dataset
+data.head()
+
+# Plot the scatter plot
+data.plot.scatter('RM', 'MEDV')
+
+# Prepare the data for training
+X = data[['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX', 'PTRATIO', 'LSTAT']]
+Y = data['MEDV']
+
+# Split the data into training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y)
+
+# Create a linear regression model
+model = LinearRegression()
+
+# Train the model
+model.fit(X_train, Y_train)
+
+# Make predictions on the test data
+predictions = model.predict(X_test)
+
+# Plot the predictions
+plt.scatter(Y_test, predictions)
+plt.xlabel('Y Test')
+plt.ylabel('Predicted Y')
+
+# Calculate evaluation metrics
+print('[INFO]\tMean Absolute Error:\t', metrics.mean_absolute_error(Y_test, predictions))
+print('[INFO]\tMean Squared Error:\t', metrics.mean_squared_error(Y_test, predictions))
+print('[INFO]\tRoot Mean Squared Error:', np.sqrt(metrics.mean_squared_error(Y_test, predictions)))

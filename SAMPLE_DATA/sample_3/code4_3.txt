@@ -1,0 +1,52 @@
+#include<stdio.h>
+
+int main() {
+    int row, col, m, n, ans;
+    printf("Enter rows and columns: ");
+    scanf("%d%d", &row, &col);
+
+    printf("Enter values:\n");
+    int inp[row][col];
+    int sub_arr[row][col];
+
+    for (m = 0; m < row; m++) {
+        for (n = 0; n < col; n++) {
+            scanf("%d", &inp[m][n]);
+        }
+    }
+
+    int largest = 0;
+    int maxRow = 0, maxCol = 0;
+    for (m = 0; m < row; m++) {
+        for (n = 0; n < col; n++) {
+            if (m == 0 || n == 0) {
+                sub_arr[m][n] = inp[m][n];
+                largest = (inp[m][n] > largest) ? inp[m][n] : largest;
+            }
+
+            else if (inp[m][n] == 1) {
+                int mini = (sub_arr[m - 1][n] < sub_arr[m][n - 1]) ? sub_arr[m - 1][n] : sub_arr[m][n - 1];
+                mini = (mini < sub_arr[m - 1][n - 1]) ? mini : sub_arr[m - 1][n - 1];
+                sub_arr[m][n] = 1 + mini;
+
+                if (sub_arr[m][n] > largest) {
+                    largest = sub_arr[m][n];
+                    maxRow = m - 2;
+                    maxCol = n - 2;
+                }
+            }
+        }
+    }
+
+    printf("\n\n\tMax possible: %d\n", largest);
+    for (m = 0; m < largest; m++) {
+        for (n = 0; n < largest; n++) {
+            printf("1 ", sub_arr[m][n]);
+        }
+        printf("\n");
+    }
+    printf("Starting position (row, col): (%d, %d)\n", maxRow, maxCol);
+    printf("Dimensions (rows x columns): %dx%d\n", largest, largest);
+
+    return 0;
+}

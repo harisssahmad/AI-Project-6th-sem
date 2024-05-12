@@ -1,0 +1,6 @@
+You are tasked with implementing a program to find the largest square submatrix of 1s in a given binary
+matrix. Write a C program that does the following:
+1. Input a binary matrix (a 2D array of 0s and 1s) from the user. The matrix can be of any size.
+2. Find and display the largest square submatrix of 1s in the input matrix.
+3. Display the dimensions (rows and columns) of the largest square submatrix found.
+4. If there are more than one largest square matrix, then find any one of them.
