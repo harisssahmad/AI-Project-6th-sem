@@ -6,8 +6,11 @@ require("dotenv").config();
 
 const Groq = require("groq-sdk");
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY_2,
+    apiKey: process.env.GROQ_API_KEY_1,
 });
+
+let currentApiKeyIndex = 0;
+const apiKeys = [process.env.GROQ_API_KEY_1, process.env.GROQ_API_KEY_2];
 
 app.use(express.json());
 
@@ -63,20 +66,21 @@ app.post("/api/single-code-plag-check", async (req, res) => {
     res.send(chatCompletion.choices[0]?.message?.content);
 });
 
-app.post("/api/two-code-plag-check", async (req, res) => {
-    const { task, codeA, codeB } = req.body;
+const TwoCodePlagCheck = async (req, res) => {
+    try {
+        const { task, codeA, codeB } = req.body;
 
-    const chatCompletion = await groq.chat.completions.create({
-        model: "mixtral-8x7b-32768",
-        messages: [
-            {
-                role: "system",
-                content:
-                    "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
-            },
-            {
-                role: "user",
-                content: `You've been presented with two code samples (Code A and Code B) that aim to solve the same problem, which is to ${task}. My task is to thoroughly evaluate both codes and provide feedback on the following aspects:
+        const chatCompletion = await groq.chat.completions.create({
+            model: "mixtral-8x7b-32768",
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "You are a helpful assistant that evaluates code samples and detects plagiarism. Give answer as a JSON object",
+                },
+                {
+                    role: "user",
+                    content: `You've been presented with two code samples (Code A and Code B) that aim to solve the same problem, which is to ${task}. My task is to thoroughly evaluate both codes and provide feedback on the following aspects:
 
                 1. **Code Understanding**: Can the code correctly solve the problem as stated?
                 2. **Code Quality**: Is the code well-structured, readable, and maintainable?
@@ -113,16 +117,29 @@ app.post("/api/two-code-plag-check", async (req, res) => {
                     small comment
                   }
                 }`,
-            },
-        ],
-    });
+                },
+            ],
+        });
 
-    const jsonResponse = JSON.parse(
-        chatCompletion.choices[0]?.message?.content
-    );
+        const jsonResponse = JSON.parse(
+            chatCompletion.choices[0]?.message?.content
+        );
+        res.send(chatCompletion.choices[0]?.message?.content);
+    } catch (error) {
+        console.log(error);
+        if (error.response && error.response.status === 500) {
+            console.log("hello");
+            currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
+            groq = new Groq({ apiKey: apiKeys[currentApiKeyIndex] });
+            TwoCodePlagCheck(req, res);
+            return;
+        }
+        // For other errors, return the error response
+        res.status(500).json({ error: error });
+    }
+};
 
-    res.send(chatCompletion.choices[0]?.message?.content);
-});
+app.post("/api/two-code-plag-check", TwoCodePlagCheck);
 
 app.post("/", (req, res) => {
     console.log(req.body);
