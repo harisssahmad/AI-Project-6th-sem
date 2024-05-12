@@ -114,7 +114,7 @@ const TwoCodePlagCheck = async (req, res) => {
                     "feedback": small feedback
                   },
                   "plagiarism": {
-                    small comment
+                    feedback
                   }
                 }`,
                 },
@@ -124,7 +124,8 @@ const TwoCodePlagCheck = async (req, res) => {
         const jsonResponse = JSON.parse(
             chatCompletion.choices[0]?.message?.content
         );
-        res.send(chatCompletion.choices[0]?.message?.content);
+        console.log(jsonResponse);
+        res.send(jsonResponse);
     } catch (error) {
         console.log(error);
         if (error.response && error.response.status === 500) {

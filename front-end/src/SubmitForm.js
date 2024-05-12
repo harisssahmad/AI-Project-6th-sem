@@ -1,95 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
-import styled from "styled-components";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import {
+    TextArea,
+    Container,
+    Label,
+    SwitchButton,
+    FileInput,
+    FileLabel,
+    SuccessFileLabel,
+    FadeIn,
+} from "./StyledComponents.js";
 import axios from "axios";
-
-// Styled components for styling
-
-const TextArea = styled.textarea`
-    width: 95%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    resize: vertical; /* Allow vertical resizing */
-`;
-
-const Container = styled.div`
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-`;
-
-const Label = styled.label`
-    display: block;
-    margin-bottom: 10px;
-`;
-
-const Input = styled.input`
-    width: 95%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-`;
-
-const Button = styled.button`
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    display: block; /* Ensure buttons are on separate lines */
-`;
-
-const SwitchButton = styled(Button)`
-    background-color: #54a4a7;
-`;
-
-const FileInput = styled.input.attrs({ type: "file" })`
-    display: none;
-`;
-
-const FileLabel = styled.label`
-    display: inline-block;
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    display: block; /* Ensure buttons are on separate lines */
-`;
-
-const Table = styled.table`
-    width: 100%;
-    border-collapse: collapse;
-`;
-
-const Th = styled.th`
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px;
-    text-align: left;
-`;
-
-const Td = styled.td`
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-`;
-
-const FadeIn = styled.div`
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    &.fade-in {
-        opacity: 1;
-    }
-`;
 
 const capitalizeFirstLetter = (str) => {
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -100,10 +31,13 @@ const SubmitForm = () => {
     const [fieldType, setFieldType] = useState("text"); // 'text' or 'file'
     const [code1, setCode1] = useState("");
     const [code2, setCode2] = useState("");
+    const fileInput1Ref = useRef(null);
+    const fileInput2Ref = useRef(null);
     const [response, setResponse] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [randomStatement, setRandomStatement] = useState("");
     const [showResponse, setShowResponse] = useState(false);
+    const [err, setErr] = useState(false);
 
     const statement = [
         "Oh, don't worry, our AI teacher is graciously accepting the burden of scrutinizing your assignments.",
@@ -115,6 +49,30 @@ const SubmitForm = () => {
         "It's a tough job, but someone's AI teacher has to do it—luckily, it's yours!",
         "Take a break, our AI teacher is on duty, ready to be the unyielding judge of your assignments.",
     ];
+
+    useEffect(() => {
+        const loader = document.querySelector(".loader");
+        if (isLoading && loader) {
+            loader.style.display = "block";
+        }
+
+        if (response === null && loader && !isLoading) {
+            loader.style.display = "none";
+        }
+    }, [isLoading, response]);
+
+    useEffect(() => {
+        let timeoutId;
+        if (err) {
+            timeoutId = setTimeout(() => {
+                setErr(false);
+            }, 5000);
+        }
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [err]);
 
     const injectRandomStatement = () => {
         const randomIndex = Math.floor(Math.random() * statement.length);
@@ -134,32 +92,61 @@ const SubmitForm = () => {
         setFieldType(fieldType === "text" ? "file" : "text");
     };
 
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        const fileContents = await readFileAsync(file);
+        const fileId = e.target.id;
+
+        if (fileId === "file1") {
+            setCode1(fileContents);
+        } else if (fileId === "file2") {
+            setCode2(fileContents);
+        }
+    };
+
+    const readFileAsync = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.onerror = reject;
+            reader.readAsText(file);
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            injectRandomStatement();
-            setQuestion("");
-            setResponse(null);
-            setIsLoading(true);
-            const res = await axios.post(
-                "http://localhost:3001/api/two-code-plag-check",
-                {
-                    task: question,
-                    codeA: code1,
-                    codeB: code2,
-                }
-            );
-            setIsLoading(false);
-            setResponse(res.data);
-            setShowResponse(true);
-        } catch (error) {
-            console.error("Error:", error);
+        if (!question || !code1 || !code2) {
+            setErr(true);
+        } else {
+            try {
+                injectRandomStatement();
+                setQuestion("");
+                setResponse(null);
+                setIsLoading(true);
+                const res = await axios.post(
+                    "http://localhost:3001/api/two-code-plag-check",
+                    {
+                        task: question,
+                        codeA: code1,
+                        codeB: code2,
+                    }
+                );
+                setIsLoading(false);
+                setResponse(res.data);
+                setShowResponse(true);
+            } catch (error) {
+                console.error("Error:", error);
+            }
         }
     };
 
     const toggleResponse = () => {
         setShowResponse(!showResponse);
         setResponse(null);
+        setCode1(null);
+        setCode2(null);
     };
 
     return (
@@ -175,7 +162,6 @@ const SubmitForm = () => {
                                 onChange={(e) => setQuestion(e.target.value)}
                                 placeholder="Enter the question statement"
                             />
-
                             <Label>
                                 {fieldType === "text"
                                     ? "Paste codes here:"
@@ -186,6 +172,7 @@ const SubmitForm = () => {
                                     <TextArea
                                         placeholder="Enter Code # 1"
                                         rows={5}
+                                        value={code1}
                                         onChange={(e) =>
                                             setCode1(e.target.value)
                                         }
@@ -193,6 +180,7 @@ const SubmitForm = () => {
                                     <TextArea
                                         placeholder="Enter Code # 2"
                                         rows={5}
+                                        value={code2}
                                         onChange={(e) =>
                                             setCode2(e.target.value)
                                         }
@@ -200,38 +188,104 @@ const SubmitForm = () => {
                                 </>
                             ) : (
                                 <>
-                                    <FileLabel htmlFor="file1">
-                                        Upload Code # 1
-                                    </FileLabel>
-                                    <FileInput id="file1" />
-                                    <FileLabel htmlFor="file2">
-                                        Upload Code # 2
-                                    </FileLabel>
-                                    <FileInput id="file2" />
+                                    {code1 ? (
+                                        <>
+                                            <TextArea
+                                                rows={4}
+                                                value={code1}
+                                                onChange={(e) =>
+                                                    setCode1(e.target.value)
+                                                }
+                                            />
+                                            <SuccessFileLabel htmlFor="file1">
+                                                Code # 1 uploaded!
+                                                <FileInput
+                                                    id="file1"
+                                                    ref={fileInput1Ref}
+                                                    onChange={handleFileChange}
+                                                />
+                                            </SuccessFileLabel>
+                                        </>
+                                    ) : (
+                                        <FileLabel htmlFor="file1">
+                                            Upload Code # 1
+                                            <FileInput
+                                                id="file1"
+                                                ref={fileInput1Ref}
+                                                onChange={handleFileChange}
+                                            />
+                                        </FileLabel>
+                                    )}
+                                    {code2 ? (
+                                        <>
+                                            <TextArea
+                                                rows={4}
+                                                value={code2}
+                                                onChange={(e) =>
+                                                    setCode2(e.target.value)
+                                                }
+                                            />
+                                            <SuccessFileLabel htmlFor="file2">
+                                                Code # 2 uploaded!
+                                                <FileInput
+                                                    id="file2"
+                                                    ref={fileInput2Ref}
+                                                    onChange={handleFileChange}
+                                                />
+                                            </SuccessFileLabel>
+                                        </>
+                                    ) : (
+                                        <FileLabel htmlFor="file2">
+                                            Upload Code # 2
+                                            <FileInput
+                                                id="file2"
+                                                ref={fileInput2Ref}
+                                                onChange={handleFileChange}
+                                            />
+                                        </FileLabel>
+                                    )}
                                 </>
                             )}
-                            <SwitchButton
+                            <Button
                                 type="button"
                                 id="switchBtn"
+                                size="medium"
+                                variant="outlined"
                                 onClick={handleToggleFieldType}
+                                style={{ margin: "10px 0 20px 0" }}
                             >
                                 {fieldType === "text"
                                     ? "Switch to File Upload"
                                     : "Switch to Text Field"}
-                            </SwitchButton>
+                            </Button>
 
-                            <Button type="submit">Submit</Button>
+                            <br />
+
+                            <Button
+                                size="large"
+                                type="submit"
+                                variant="contained"
+                            >
+                                Submit
+                            </Button>
                         </form>
                     )}
 
-                    <FadeIn className={isLoading ? "fade-in" : ""}>
-                        <div>
+                    <FadeIn className={isLoading ? "fade-in loader" : "loader"}>
+                        <div
+                            style={{
+                                margin: "0 auto",
+                                textAlign: "center",
+                                width: "80%",
+                            }}
+                        >
                             <MagnifyingGlass
                                 visible={true}
                                 height="80"
                                 width="80"
                                 ariaLabel="magnifying-glass-loading"
-                                wrapperStyle={{}}
+                                wrapperStyle={{ margin: "0 auto" }}
+                                style={{ margin: "0 auto" }}
                                 wrapperClass="magnifying-glass-wrapper"
                                 glassColor="#c0efff"
                                 color="#e15b64"
@@ -239,44 +293,65 @@ const SubmitForm = () => {
                             <p>{randomStatement}</p>
                         </div>
                     </FadeIn>
+                    {err && (
+                        <div style={{ textAlign: "center", marginTop: "20px" }}>
+                            <Button variant="outlined" color="error">
+                                Kindly fill in all the fields first!
+                            </Button>
+                        </div>
+                    )}
                 </Container>
-            )}
-
-            {!isLoading && showResponse && (
-                <FadeIn className={response ? "fade-in" : ""}>
-                    <Button onClick={toggleResponse}>{"Go back"}</Button>
-                </FadeIn>
             )}
 
             {response && (
                 <FadeIn className={response ? "fade-in" : ""}>
                     <Table>
-                        <thead>
-                            <tr>
-                                <Th>Aspect</Th>
-                                <Th>Code # 1</Th>
-                                <Th>Code # 2</Th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Aspect</TableCell>
+                                <TableCell>Code # 1</TableCell>
+                                <TableCell>Code # 2</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
                             {Object.keys(response.code_a).map((aspect) => (
-                                <tr key={aspect}>
-                                    <Td>
+                                <TableRow key={aspect}>
+                                    <TableCell>
                                         {capitalizeFirstLetter(
                                             aspect.replace(/_/g, " ")
                                         )}
-                                    </Td>
-                                    <Td>{response.code_a[aspect]}</Td>
-                                    <Td>{response.code_b[aspect]}</Td>
-                                </tr>
+                                    </TableCell>
+                                    <TableCell>
+                                        {response.code_a[aspect]}
+                                    </TableCell>
+                                    <TableCell>
+                                        {response.code_b[aspect]}
+                                    </TableCell>
+                                </TableRow>
                             ))}
-                            <tr>
-                                <Th colSpan={1}>Plagiarism comment</Th>
-                                <Td colSpan={2}>{response.plagiarism}</Td>
-                            </tr>
-                        </tbody>
+                            <TableRow>
+                                <TableCell colSpan={1}>
+                                    <b>Plagiarism comment</b>
+                                </TableCell>
+                                <TableCell colSpan={2}>
+                                    <b>{response.plagiarism.feedback}</b>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
                     </Table>
                 </FadeIn>
+            )}
+
+            <br />
+
+            {!isLoading && showResponse && (
+                <Button
+                    variant="contained"
+                    startIcon={<ArrowBackIcon />}
+                    onClick={toggleResponse}
+                >
+                    Go Back
+                </Button>
             )}
         </div>
     );
