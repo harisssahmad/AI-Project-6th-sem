@@ -3,18 +3,14 @@ import { MagnifyingGlass } from "react-loader-spinner";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import {
     TextArea,
     Container,
     Label,
-    SwitchButton,
     FileInput,
     FileLabel,
     SuccessFileLabel,
@@ -126,7 +122,7 @@ const SubmitForm = () => {
                 setResponse(null);
                 setIsLoading(true);
                 const res = await axios.post(
-                    "http://localhost:3001/api/two-code-plag-check",
+                    "http://localhost:3001/api/plag-check",
                     {
                         task: question,
                         codeA: code1,
