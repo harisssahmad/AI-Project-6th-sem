@@ -57,7 +57,7 @@ Please follow the following steps for successful installation:
   - Worked on the frontend, using React JS to provide a seamless web experience
 
 - Saad Salman:
-  - Worked on the backend, using Express JS to create RESTful API and  providegraceful error handling
+  - Worked on the backend, using Express JS to create RESTful API and  provide graceful error handling
 
 - Sarim Uzzaman:
   - Worked on proompt engineering to develop a robust prompt that performs the task of code checking and plagiarism detection, on Groq's online playground
